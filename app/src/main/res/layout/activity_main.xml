@@ -12,9 +12,25 @@
     tools:context="com.example.vrungel.exchangerates.view.MainActivity"
     >
 
-  <TextView
+  <ScrollView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Hello World!"
+      >
+    <TextView
+        android:id="@+id/tvData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        />
+  </ScrollView>
+
+  <android.support.design.widget.FloatingActionButton
+      android:id="@+id/fabSend"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentEnd="true"
+      android:layout_alignParentRight="true"
+      android:background="@android:drawable/ic_menu_upload"
       />
 </RelativeLayout>

@@ -1,8 +1,8 @@
 package com.example.vrungel.exchangerates.di.modules;
 
+import com.example.vrungel.exchangerates.model.BankApi;
 import com.example.vrungel.exchangerates.model.DataManager;
-import com.example.vrungel.exchangerates.model.SalonApi;
-import com.example.vrungel.exchangerates.model.remote.RestApi;
+import com.example.vrungel.exchangerates.model.RestApi;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -14,11 +14,11 @@ import retrofit2.Retrofit;
 
 @Module(includes = { RetrofitModule.class }) public class DataModule {
 
-  @Provides @Singleton SalonApi provideSalonApi(Retrofit retrofit) {
-    return retrofit.create(SalonApi.class);
+  @Provides @Singleton BankApi provideSalonApi(Retrofit retrofit) {
+    return retrofit.create(BankApi.class);
   }
 
-  @Provides @Singleton RestApi provideRestApi(SalonApi api) {
+  @Provides @Singleton RestApi provideRestApi(BankApi api) {
     return new RestApi(api);
   }
 
