@@ -6,6 +6,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -41,5 +44,24 @@ public class MainActivity extends BaseActivity implements IMainActivityView {
   @OnClick(R.id.fabSend)
   public void fabSendClicked(){
     mMainActivityPresenter.makeQuery(Constants.CurrencyType.USD);
+  }
+
+  @Override public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.main_activity_menu, menu);
+    return true;
+  }
+
+  @Override public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == R.id.menu_USD){
+      mMainActivityPresenter.makeQuery(Constants.CurrencyType.USD);
+    }
+    if (item.getItemId() == R.id.menu_EUR){
+      mMainActivityPresenter.makeQuery(Constants.CurrencyType.EUR);
+    }
+    if (item.getItemId() == R.id.menu_RUB){
+      mMainActivityPresenter.makeQuery(Constants.CurrencyType.RUB);
+    }
+    return true;
   }
 }
