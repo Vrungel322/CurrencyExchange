@@ -7,6 +7,7 @@ import com.example.vrungel.exchangerates.model.remote.ExchangeEntity;
 import com.example.vrungel.exchangerates.presenter.interfaces.IMainActivityPresenter;
 import com.example.vrungel.exchangerates.view.IMainActivityView;
 import javax.inject.Inject;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -28,16 +29,17 @@ import rx.schedulers.Schedulers;
     //makeQuery();
   }
 
-  @Override public void makeQuery() {
+  @Override public void makeQuery(String currencyType) {
     //Log.d("response", "makeQuery");
-
     Subscription subscriptionMakeQuery = mDataManager.makeQuery("01.12.2014")
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
+        .map(ExchangeEntity::getExchangeRate)
+        .flatMap(Observable::from)
+        .filter(exchangeRate -> exchangeRate.getCurrency().equals(currencyType))
         .subscribe(exchangeEntity -> {
-          getViewState().showText(exchangeEntity.toString());
+          getViewState().showCurrency(exchangeEntity);
         }, throwable -> {
-          getViewState().showText(throwable.toString());
         });
     addToUnsubscription(subscriptionMakeQuery);
   }
