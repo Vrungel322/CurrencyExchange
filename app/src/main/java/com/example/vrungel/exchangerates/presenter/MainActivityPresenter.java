@@ -6,6 +6,14 @@ import com.example.vrungel.exchangerates.model.DataManager;
 import com.example.vrungel.exchangerates.model.remote.ExchangeEntity;
 import com.example.vrungel.exchangerates.presenter.interfaces.IMainActivityPresenter;
 import com.example.vrungel.exchangerates.view.IMainActivityView;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 import javax.inject.Inject;
 import rx.Observable;
 import rx.Subscription;
@@ -24,23 +32,45 @@ import rx.schedulers.Schedulers;
     App.getAppComponent().inject(this);
   }
 
-  @Override protected void onFirstViewAttach() {
-    super.onFirstViewAttach();
-    //makeQuery();
+  @Override public void makeQueryWithTimeline(String currencyType, String startData, String endData) {
+    List<String > dates = getDaysBetweenDates(startData, endData);
+    //Log.d("response", "makeQueryWithTimeline");
+    for (int i = 0; i < dates.size(); i++){
+      Subscription subscriptionMakeQuery = mDataManager.makeQuery(dates.get(i))
+          .subscribeOn(Schedulers.io())
+          .observeOn(AndroidSchedulers.mainThread())
+          .map(ExchangeEntity::getExchangeRate)
+          .flatMap(Observable::from)
+          .filter(exchangeRate -> exchangeRate.getCurrency().equals(currencyType))
+          .subscribe(exchangeEntity -> {
+            getViewState().showCurrency(exchangeEntity);
+          }, throwable -> {
+          });
+      addToUnsubscription(subscriptionMakeQuery);
+    }
+
   }
 
-  @Override public void makeQuery(String currencyType) {
-    //Log.d("response", "makeQuery");
-    Subscription subscriptionMakeQuery = mDataManager.makeQuery("01.12.2014")
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .map(ExchangeEntity::getExchangeRate)
-        .flatMap(Observable::from)
-        .filter(exchangeRate -> exchangeRate.getCurrency().equals(currencyType))
-        .subscribe(exchangeEntity -> {
-          getViewState().showCurrency(exchangeEntity);
-        }, throwable -> {
-        });
-    addToUnsubscription(subscriptionMakeQuery);
+  private static List<String> getDaysBetweenDates(String sStartDate, String sEndDate) {
+    List<String> totalDates = new ArrayList<>();
+
+    DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+    try {
+      Date dStartDate = format.parse(sStartDate);
+      Date dEndDate = format.parse(sEndDate);
+
+      Calendar calendar = new GregorianCalendar();
+      calendar.setTime(dStartDate);
+
+      while (calendar.getTime().before(dEndDate)) {
+        Date result = calendar.getTime();
+        totalDates.add(format.format(result));
+        calendar.add(Calendar.DATE, 1);
+      }
+      totalDates.add(sEndDate);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    return totalDates;
   }
 }
